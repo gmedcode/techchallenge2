@@ -21,3 +21,8 @@ variable "node_instance_type" {
   type        = string
   default     = "t3.small"
 }
+
+variable "github_username" {
+  description = "Your GitHub username or org (used to scope the GitHub Actions OIDC role to your repo only)"
+  type        = string
+}
