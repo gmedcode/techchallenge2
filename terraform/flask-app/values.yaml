@@ -1,0 +1,84 @@
+# Number of pod replicas to start with (before HPA kicks in and adjusts this)
+replicaCount: 1
+
+# The Docker image this deployment will run
+image:
+  # ECR repository URI — replace <YOUR_ACCOUNT_ID> with your own AWS account ID before deploying
+  # Find yours with: aws sts get-caller-identity
+  repository: <YOUR_ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/flask-hello-world
+  # IfNotPresent = only pull the image if it's not already cached on the node
+  pullPolicy: IfNotPresent
+  # Which image tag to deploy (Jenkins will typically override this per build)
+  tag: "latest"
+
+# Used if pulling from a private registry that requires auth secrets (not needed here — ECR auth is handled via IAM instead)
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# Kubernetes ServiceAccount tied to this app's pods
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+securityContext: {}
+
+# Internal Kubernetes Service — routes traffic to the pods within the cluster
+service:
+  type: ClusterIP
+  port: 5000
+
+# Ingress — this is what tells the AWS Load Balancer Controller to provision an ALB
+ingress:
+  enabled: true
+  className: alb
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+  hosts:
+    - host: ""
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+httpRoute:
+  enabled: false
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 50
+  targetMemoryUtilizationPercentage: 50
+
+volumes: []
+volumeMounts: []
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
