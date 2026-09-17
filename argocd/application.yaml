@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: flask-app
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/gmedcode/techchallenge2.git
+    targetRevision: gitops
+    path: flask-app
+    helm:
+      parameters:
+        - name: image.repository
+          # Replace <YOUR_ACCOUNT_ID> with your AWS account ID before applying
+          # (find yours with: aws sts get-caller-identity)
+          value: <YOUR_ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/flask-hello-world
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
