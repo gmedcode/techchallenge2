@@ -3,8 +3,7 @@ pipeline {
 
     environment {
         AWS_REGION     = 'us-east-1'
-        // Replace <YOUR_ACCOUNT_ID> with your AWS account ID (find it via: aws sts get-caller-identity)
-        ECR_REPO       = '<YOUR_ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/flask-hello-world'
+        ECR_REPO       = "${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/flask-hello-world"
         CLUSTER_NAME   = 'hello-world-cluster'
         IMAGE_TAG      = "${env.BUILD_NUMBER}"
     }
