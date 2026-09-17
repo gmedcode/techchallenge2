@@ -37,6 +37,16 @@ resource "aws_security_group" "jenkins" {
   }
 }
 
+# Allow Jenkins to reach the EKS control plane API
+resource "aws_security_group_rule" "eks_cluster_allow_jenkins" {
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.jenkins.id
+  security_group_id        = aws_eks_cluster.main.vpc_config[0].cluster_security_group_id
+}
+
 # IAM role for the Jenkins EC2 instance — needs ECR push access and EKS access
 resource "aws_iam_role" "jenkins" {
   name = "${var.cluster_name}-jenkins-role"
