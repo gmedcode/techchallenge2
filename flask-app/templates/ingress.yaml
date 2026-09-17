@@ -1,18 +1,24 @@
 {{- if .Values.ingress.enabled -}}
+# Ingress — this is the resource that tells the AWS Load Balancer Controller
+# to actually provision an ALB and route external traffic to this app.
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ include "flask-app.fullname" . }}
   labels:
     {{- include "flask-app.labels" . | nindent 4 }}
+  # Annotations here tell the ALB controller how to configure the load balancer
+  # (scheme, target type, etc. — set in values.yaml under ingress.annotations)
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
+  # "alb" — tells Kubernetes to route this Ingress through the AWS Load Balancer Controller
   {{- with .Values.ingress.className }}
   ingressClassName: {{ . }}
   {{- end }}
+  # TLS/HTTPS config — not used in this project (no custom domain/certificate), so this block is skipped
   {{- if .Values.ingress.tls }}
   tls:
     {{- range .Values.ingress.tls }}
@@ -25,10 +31,18 @@ spec:
   {{- end }}
   rules:
     {{- range .Values.ingress.hosts }}
-    - host: {{ .host | quote }}
+    # Only include the "host" field if one is actually set in values.yaml.
+    # We leave host blank, since we're not using a custom domain — the ALB
+    # will generate and expose its own public DNS name automatically, and
+    # this way the rule matches traffic on ANY incoming hostname.
+    - {{- if .host }}
+      host: {{ .host | quote }}
+      {{- end }}
       http:
         paths:
           {{- range .paths }}
+          # Routes all paths ("/") to our Flask app's Service, on the port
+          # defined in values.yaml (5000)
           - path: {{ .path }}
             {{- with .pathType }}
             pathType: {{ . }}
