@@ -34,7 +34,7 @@ resource "aws_iam_role" "github_actions" {
         StringLike = {
           # Scopes this role so ONLY workflows running from your repo
           # (any branch) can assume it
-          "token.actions.githubusercontent.com:sub" = "repo:${var.github_username}/techchallenge2:*"
+          "token.actions.githubusercontent.com:sub" = "repo:${var.github_username}*/techchallenge2*:*"
         }
       }
     }]
