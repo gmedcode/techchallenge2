@@ -64,13 +64,14 @@ resource "aws_iam_role_policy_attachment" "node_ecr_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
 
-# Managed node group — 1 active, scalable to 4, t3.small, Amazon Linux 2 (default)
+# Managed node group — 1 active, scalable to 4, t3.small, Amazon Linux 2
 resource "aws_eks_node_group" "main" {
   cluster_name    = aws_eks_cluster.main.name
   node_group_name = "${var.cluster_name}-nodes"
   node_role_arn   = aws_iam_role.node.arn
   subnet_ids      = aws_subnet.private[*].id
 
+  ami_type       = "AL2_x86_64"
   instance_types = [var.node_instance_type]
 
   scaling_config {
