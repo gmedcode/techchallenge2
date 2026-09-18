@@ -78,7 +78,7 @@ terraform apply -var="github_username=<YOUR_GITHUB_USERNAME>"
 ```
 Creates the VPC, EKS cluster, node group, ECR repository, and (on `main`) the Jenkins EC2 server. Takes ~15–20 minutes, mostly EKS cluster creation.
 
-> `github_username` is only used for the GitHub Actions IAM trust policy on the `gitops` branch. On `main` you can pass any value — it isn't referenced there.
+> `github_username` is only used for the GitHub Actions IAM trust policy on the `gitops` branch. On `main` you can pass any value — it isn't referenced there. Running terraform apply with -> -var="github_username=<YOUR_GITHUB_USERNAME>" <- ensures you don't have to type your github username each time. This variable was added to ensure communication with gitops and IAM trust policy.
 
 ### 3. Connect kubectl to the new cluster
 ```bash
